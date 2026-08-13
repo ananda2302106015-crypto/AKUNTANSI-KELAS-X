@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kuis Bab 1 — Proses Bisnis & Standar Akuntansi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,500;0,600;0,700;1,500&family=IBM+Plex+Mono:wght@400;500;600;700&family=Source+Serif+4:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #dfe8de;
+    --paper-deep: #cfdccd;
+    --rule-red: #a8393f;
+    --ink: #1f2d3a;
+    --ink-soft: #3d4f5c;
+    --brass: #af8a2e;
+    --brass-bright: #c9a13a;
+    --green-ok: #2f6b4f;
+    --green-ok-bg: #dcebe0;
+    --red-bad: #a8393f;
+    --red-bad-bg: #f3dede;
+    --paper-shadow: rgba(31,45,58,0.18);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(1200px 800px at 15% -10%, #eef4ec 0%, transparent 55%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Source Serif 4', Georgia, serif;
+    display:flex;
+    justify-content:center;
+    padding:28px 14px 60px;
+  }
+  .sheet{
+    width:100%;
+    max-width:640px;
+  }
+
+  /* ---- Ledger header ---- */
+  .letterhead{
+    text-align:center;
+    padding-bottom:14px;
+    margin-bottom:18px;
+    border-bottom:3px double var(--ink);
+    position:relative;
+  }
+  .letterhead .kop{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .letterhead h1{
+    font-family:'Spectral', serif;
+    font-weight:700;
+    font-size:clamp(24px,6vw,32px);
+    margin:6px 0 4px;
+    letter-spacing:.01em;
+  }
+  .letterhead p{
+    margin:0;
+    font-style:italic;
+    color:var(--ink-soft);
+    font-size:14.5px;
+  }
+
+  /* ---- Ledger tally strip ---- */
+  .tally{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    background:var(--paper-deep);
+    border:1.5px solid var(--ink);
+    border-radius:2px;
+    margin-bottom:22px;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .tally div{
+    padding:9px 6px;
+    text-align:center;
+    border-right:1px dashed var(--rule-red);
+  }
+  .tally div:last-child{border-right:none;}
+  .tally .label{
+    display:block;
+    font-size:9.5px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:3px;
+  }
+  .tally .val{
+    display:block;
+    font-size:18px;
+    font-weight:600;
+  }
+
+  /* progress bar as filled ledger row */
+  .progress-row{
+    height:6px;
+    background:var(--paper-deep);
+    border:1px solid var(--ink);
+    border-radius:3px;
+    overflow:hidden;
+    margin-bottom:26px;
+  }
+  .progress-fill{
+    height:100%;
+    background:repeating-linear-gradient(90deg, var(--brass) 0 8px, var(--brass-bright) 8px 16px);
+    width:0%;
+    transition:width .4s ease;
+  }
+
+  /* ---- Question card ---- */
+  .card{
+    background:#eef3ea;
+    border:1.5px solid var(--ink);
+    border-radius:3px;
+    padding:22px 20px 20px;
+    position:relative;
+    box-shadow:6px 6px 0 var(--paper-shadow);
+    margin-bottom:18px;
+  }
+  .qnum{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--brass);
+    font-weight:600;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .qtext{
+    font-family:'Spectral', serif;
+    font-weight:600;
+    font-size:19px;
+    line-height:1.45;
+    margin:0 0 18px;
+  }
+
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:9px;
+  }
+  .opt{
+    display:flex;
+    align-items:flex-start;
+    gap:11px;
+    text-align:left;
+    background:#fbfaf4;
+    border:1.5px solid #9fae9c;
+    border-radius:3px;
+    padding:11px 13px;
+    font-family:'Source Serif 4', Georgia, serif;
+    font-size:15.5px;
+    line-height:1.4;
+    color:var(--ink);
+    cursor:pointer;
+    transition:border-color .15s, background .15s, transform .1s;
+  }
+  .opt:hover:not(:disabled){
+    border-color:var(--brass);
+    background:#fff;
+  }
+  .opt:active:not(:disabled){transform:scale(.995);}
+  .opt-letter{
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:700;
+    font-size:13.5px;
+    width:22px;height:22px;
+    flex:none;
+    display:flex;align-items:center;justify-content:center;
+    border:1.5px solid var(--ink-soft);
+    border-radius:50%;
+  }
+  .opt.correct{
+    background:var(--green-ok-bg);
+    border-color:var(--green-ok);
+  }
+  .opt.correct .opt-letter{background:var(--green-ok);border-color:var(--green-ok);color:#fff;}
+  .opt.wrong{
+    background:var(--red-bad-bg);
+    border-color:var(--red-bad);
+    text-decoration:line-through;
+    text-decoration-color:var(--red-bad);
+  }
+  .opt.wrong .opt-letter{background:var(--red-bad);border-color:var(--red-bad);color:#fff;}
+  .opt:disabled{cursor:default;}
+  .opt.dim{opacity:.55;}
+
+  /* ---- Stamp ---- */
+  .stamp-wrap{
+    height:0;
+    position:relative;
+  }
+  .stamp{
+    position:absolute;
+    top:-6px;
+    right:6px;
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:.12em;
+    padding:6px 12px;
+    border:3px solid currentColor;
+    border-radius:5px;
+    transform:rotate(-9deg) scale(0);
+    opacity:0;
+    animation:stampIn .35s cubic-bezier(.2,1.4,.4,1) forwards;
+    animation-delay:.05s;
+    pointer-events:none;
+    z-index:2;
+  }
+  .stamp.ok{color:var(--green-ok);}
+  .stamp.bad{color:var(--red-bad);}
+  @keyframes stampIn{
+    0%{transform:rotate(-9deg) scale(1.8);opacity:0;}
+    60%{opacity:1;}
+    100%{transform:rotate(-9deg) scale(1);opacity:.92;}
+  }
+
+  .explain{
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px dashed var(--ink-soft);
+    font-size:14.5px;
+    line-height:1.55;
+    color:var(--ink-soft);
+    display:none;
+  }
+  .explain.show{display:block;}
+  .explain b{color:var(--ink);}
+
+  .next-row{
+    display:flex;
+    justify-content:flex-end;
+    margin-top:16px;
+  }
+  button.next{
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:600;
+    font-size:13.5px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    background:var(--ink);
+    color:#eef3ea;
+    border:none;
+    padding:11px 20px;
+    border-radius:3px;
+    cursor:pointer;
+    display:none;
+  }
+  button.next.show{display:inline-flex;align-items:center;gap:6px;}
+  button.next:hover{background:#12202c;}
+
+  /* ---- Result screen ---- */
+  .result{display:none;}
+  .result.show{display:block;}
+  .result-stamp{
+    text-align:center;
+    padding:26px 20px 22px;
+    background:#eef3ea;
+    border:1.5px solid var(--ink);
+    border-radius:3px;
+    box-shadow:6px 6px 0 var(--paper-shadow);
+    margin-bottom:18px;
+  }
+  .result-stamp .predikat{
+    font-family:'Spectral', serif;
+    font-weight:700;
+    font-size:30px;
+    margin:10px 0 4px;
+  }
+  .result-stamp .skor{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:15px;
+    color:var(--ink-soft);
+  }
+  .result-stamp .keterangan{
+    margin-top:12px;
+    font-style:italic;
+    color:var(--ink-soft);
+    font-size:15px;
+  }
+  .score-bar-wrap{
+    background:var(--paper-deep);
+    border:1px solid var(--ink);
+    border-radius:3px;
+    height:14px;
+    overflow:hidden;
+    margin-top:16px;
+  }
+  .score-bar{
+    height:100%;
+    background:linear-gradient(90deg, var(--brass), var(--green-ok));
+    width:0%;
+    transition:width .8s ease;
+  }
+  .review{
+    background:#eef3ea;
+    border:1.5px solid var(--ink);
+    border-radius:3px;
+    padding:16px 18px;
+    margin-bottom:18px;
+  }
+  .review h3{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--brass);
+    margin:0 0 10px;
+  }
+  .review-row{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    padding:7px 0;
+    border-bottom:1px dashed #b9c6b6;
+    font-size:14px;
+  }
+  .review-row:last-child{border-bottom:none;}
+  .review-row .num{
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:600;
+    color:var(--ink-soft);
+    flex:none;
+    width:22px;
+  }
+  .review-row .mark{
+    flex:none;
+    font-weight:700;
+  }
+  .review-row .mark.ok{color:var(--green-ok);}
+  .review-row .mark.bad{color:var(--red-bad);}
+
+  button.restart{
+    display:block;
+    width:100%;
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:600;
+    font-size:13.5px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    background:transparent;
+    color:var(--ink);
+    border:1.5px solid var(--ink);
+    padding:13px 20px;
+    border-radius:3px;
+    cursor:pointer;
+  }
+  button.restart:hover{background:var(--ink);color:#eef3ea;}
+
+  .footer-note{
+    text-align:center;
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:20px;
+    font-family:'IBM Plex Mono', monospace;
+    letter-spacing:.03em;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .stamp{animation:none;opacity:.92;transform:rotate(-9deg) scale(1);}
+    .progress-fill, .score-bar{transition:none;}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="letterhead">
+    <div class="kop">Dasar-Dasar Akuntansi &amp; Keuangan Lembaga · Fase E / X AKL</div>
+    <h1>Kuis Bab 1</h1>
+    <p>Proses Bisnis &amp; Perkembangan Standar Akuntansi</p>
+  </div>
+
+  <div class="tally">
+    <div><span class="label">Soal</span><span class="val" id="tallyNum">1/10</span></div>
+    <div><span class="label">Benar</span><span class="val" id="tallyCorrect">0</span></div>
+    <div><span class="label">Salah</span><span class="val" id="tallyWrong">0</span></div>
+  </div>
+  <div class="progress-row"><div class="progress-fill" id="progressFill"></div></div>
+
+  <div id="quizArea"></div>
+
+  <div class="result" id="resultArea">
+    <div class="result-stamp">
+      <div class="kop" style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-soft);">Hasil Akhir</div>
+      <div class="predikat" id="predikatText">—</div>
+      <div class="skor" id="skorText">0 / 10 benar · Nilai 0</div>
+      <div class="score-bar-wrap"><div class="score-bar" id="scoreBar"></div></div>
+      <div class="keterangan" id="keteranganText"></div>
+    </div>
+
+    <div class="review">
+      <h3>Rincian Jawaban</h3>
+      <div id="reviewList"></div>
+    </div>
+
+    <button class="restart" id="restartBtn">Ulangi Kuis</button>
+  </div>
+
+  <div class="footer-note">SMK Negeri 2 Jiwan · Bab 1 — Proses Bisnis &amp; Standar Akuntansi</div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {
+    q: "Salah satu tujuan utama seseorang menjalankan kegiatan bisnis adalah ...",
+    options: [
+      "Menghabiskan modal yang dimiliki tanpa perhitungan",
+      "Menghasilkan barang atau jasa untuk memenuhi kebutuhan pelanggan dan memperoleh keuntungan",
+      "Mencatat transaksi tanpa tujuan tertentu",
+      "Menghindari persaingan usaha dengan pihak lain",
+      "Mengurangi jumlah pelanggan yang dilayani"
+    ],
+    correct: 1,
+    explain: "Bisnis dijalankan untuk menghasilkan barang/jasa yang memenuhi kebutuhan konsumen sekaligus memperoleh keuntungan."
+  },
+  {
+    q: "Usaha bengkel motor milik Pak Andi dicatat secara terpisah dari harta pribadi Pak Andi dalam pembukuan usahanya. Konsep akuntansi yang mendasari hal tersebut adalah ...",
+    options: [
+      "Konsep periode akuntansi",
+      "Konsep kesinambungan usaha (going concern)",
+      "Konsep entitas bisnis (kesatuan usaha)",
+      "Konsep harga perolehan",
+      "Konsep pengungkapan penuh"
+    ],
+    correct: 2,
+    explain: "Konsep entitas bisnis memisahkan pencatatan keuangan usaha dari harta pribadi pemiliknya."
+  },
+  {
+    q: "Bidang akuntansi yang bertugas menyusun anggaran serta menganalisis biaya produksi untuk pengambilan keputusan manajemen disebut ...",
+    options: [
+      "Akuntansi keuangan",
+      "Akuntansi biaya/manajemen",
+      "Akuntansi perpajakan",
+      "Akuntansi pemerintahan",
+      "Auditing"
+    ],
+    correct: 1,
+    explain: "Akuntansi biaya/manajemen menyediakan informasi biaya dan anggaran bagi pengambilan keputusan manajemen."
+  },
+  {
+    q: "Berikut ini yang termasuk peran akuntansi dalam kegiatan bisnis, kecuali ...",
+    options: [
+      "Menyediakan informasi untuk pengambilan keputusan",
+      "Menjadi dasar penyusunan laporan keuangan",
+      "Membantu mengevaluasi kinerja usaha",
+      "Menjadi alat pertanggungjawaban kepada pihak berkepentingan",
+      "Menentukan harga jual produk milik pesaing usaha"
+    ],
+    correct: 4,
+    explain: "Akuntansi berfokus pada pencatatan dan pelaporan keuangan entitas sendiri, bukan menentukan harga produk pesaing."
+  },
+  {
+    q: "Salon kecantikan \"Cantika\" hanya menjual pelayanan perawatan tanpa menjual barang secara langsung kepada pelanggan. Jenis perusahaan tersebut adalah ...",
+    options: [
+      "Perusahaan dagang",
+      "Perusahaan manufaktur",
+      "Perusahaan jasa",
+      "Perusahaan ekstraktif",
+      "Perusahaan agraris"
+    ],
+    correct: 2,
+    explain: "Kegiatan utama menjual pelayanan/jasa menjadikannya perusahaan jasa."
+  },
+  {
+    q: "Sebuah toko sembako membeli barang dari distributor kemudian menjualnya kembali kepada konsumen tanpa mengubah bentuk barang tersebut. Jenis perusahaan tersebut adalah ...",
+    options: [
+      "Perusahaan jasa",
+      "Perusahaan dagang",
+      "Perusahaan manufaktur",
+      "Perusahaan agraris",
+      "Perusahaan ekstraktif"
+    ],
+    correct: 1,
+    explain: "Membeli barang untuk dijual kembali tanpa mengubah bentuknya adalah ciri perusahaan dagang."
+  },
+  {
+    q: "Tahapan proses bisnis akuntansi yang khas pada perusahaan manufaktur dan tidak dijumpai pada perusahaan jasa maupun dagang adalah ...",
+    options: [
+      "Pencatatan transaksi penjualan",
+      "Penyusunan laporan laba rugi",
+      "Pengolahan bahan baku menjadi barang jadi melalui proses produksi",
+      "Pembayaran gaji karyawan",
+      "Pencatatan kas masuk dan kas keluar"
+    ],
+    correct: 2,
+    explain: "Hanya perusahaan manufaktur yang mengolah bahan baku menjadi barang jadi melalui proses produksi."
+  },
+  {
+    q: "Lembaga yang berwenang menyusun dan menetapkan Standar Akuntansi Keuangan (SAK) di Indonesia adalah ...",
+    options: [
+      "Otoritas Jasa Keuangan (OJK)",
+      "Ikatan Akuntan Indonesia (IAI)",
+      "Bank Indonesia (BI)",
+      "Kementerian Keuangan",
+      "Badan Pemeriksa Keuangan (BPK)"
+    ],
+    correct: 1,
+    explain: "Ikatan Akuntan Indonesia (IAI) adalah lembaga yang menyusun dan menetapkan SAK di Indonesia."
+  },
+  {
+    q: "Standar akuntansi yang digunakan oleh entitas syariah dan disusun berdasarkan prinsip-prinsip syariah, misalnya larangan riba, disebut ...",
+    options: [
+      "SAK ETAP",
+      "PSAK Syariah",
+      "SAK EMKM",
+      "IFRS",
+      "PSAK Umum"
+    ],
+    correct: 1,
+    explain: "PSAK Syariah mengatur pelaporan transaksi berbasis prinsip syariah, termasuk larangan riba."
+  },
+  {
+    q: "Berikut ini merupakan manfaat penggunaan aplikasi komputer akuntansi bagi pelaku usaha, kecuali ...",
+    options: [
+      "Mempercepat proses pencatatan dan pengolahan data keuangan",
+      "Meningkatkan akurasi perhitungan",
+      "Memudahkan penyusunan laporan keuangan",
+      "Menghilangkan kebutuhan tenaga kerja akuntansi sepenuhnya",
+      "Meminimalkan risiko kesalahan pencatatan manual"
+    ],
+    correct: 3,
+    explain: "Aplikasi akuntansi membantu proses kerja, namun tetap memerlukan pemahaman dan peran tenaga akuntansi."
+  }
+];
+
+let current = 0;
+let correctCount = 0;
+let answered = false;
+const userAnswers = [];
+
+const quizArea = document.getElementById('quizArea');
+const resultArea = document.getElementById('resultArea');
+const tallyNum = document.getElementById('tallyNum');
+const tallyCorrect = document.getElementById('tallyCorrect');
+const tallyWrong = document.getElementById('tallyWrong');
+const progressFill = document.getElementById('progressFill');
+
+function renderQuestion(){
+  answered = false;
+  const item = QUESTIONS[current];
+  tallyNum.textContent = (current+1) + "/" + QUESTIONS.length;
+  progressFill.style.width = (current / QUESTIONS.length * 100) + "%";
+
+  const letters = ['A','B','C','D','E'];
+  let optsHtml = '';
+  item.options.forEach((opt, i) => {
+    optsHtml += `<button class="opt" data-i="${i}">
+      <span class="opt-letter">${letters[i]}</span><span>${opt}</span>
+    </button>`;
+  });
+
+  quizArea.innerHTML = `
+    <div class="card">
+      <div class="qnum">Soal ${current+1} dari ${QUESTIONS.length}</div>
+      <p class="qtext">${item.q}</p>
+      <div class="options">${optsHtml}</div>
+      <div class="stamp-wrap" id="stampWrap"></div>
+      <div class="explain" id="explainBox"><b>Pembahasan:</b> <span id="explainText"></span></div>
+      <div class="next-row"><button class="next" id="nextBtn">${current === QUESTIONS.length-1 ? 'Lihat Hasil →' : 'Soal Berikutnya →'}</button></div>
+    </div>
+  `;
+
+  const buttons = quizArea.querySelectorAll('.opt');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => handleAnswer(parseInt(btn.dataset.i), buttons, item));
+  });
+}
+
+function handleAnswer(choice, buttons, item){
+  if(answered) return;
+  answered = true;
+  const isCorrect = choice === item.correct;
+  userAnswers.push(isCorrect);
+
+  buttons.forEach((btn, i) => {
+    btn.disabled = true;
+    if(i === item.correct) btn.classList.add('correct');
+    if(i === choice && !isCorrect) btn.classList.add('wrong');
+    if(i !== item.correct && i !== choice) btn.classList.add('dim');
+  });
+
+  if(isCorrect) correctCount++;
+  tallyCorrect.textContent = correctCount;
+  tallyWrong.textContent = (current+1) - correctCount;
+  progressFill.style.width = ((current+1) / QUESTIONS.length * 100) + "%";
+
+  const stampWrap = document.getElementById('stampWrap');
+  stampWrap.innerHTML = `<div class="stamp ${isCorrect ? 'ok':'bad'}">${isCorrect ? 'BENAR' : 'SALAH'}</div>`;
+
+  document.getElementById('explainText').textContent = item.explain;
+  document.getElementById('explainBox').classList.add('show');
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.classList.add('show');
+  nextBtn.addEventListener('click', () => {
+    current++;
+    if(current < QUESTIONS.length){
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  });
+}
+
+function showResult(){
+  quizArea.style.display = 'none';
+  resultArea.classList.add('show');
+
+  const nilai = Math.round((correctCount / QUESTIONS.length) * 100);
+  document.getElementById('skorText').textContent = `${correctCount} / ${QUESTIONS.length} benar · Nilai ${nilai}`;
+  document.getElementById('scoreBar').style.width = nilai + '%';
+
+  let predikat, ket;
+  if(nilai >= 90){ predikat = 'Sangat Baik'; ket = 'Menguasai seluruh submateri dengan sangat baik.'; }
+  else if(nilai >= 80){ predikat = 'Baik'; ket = 'Menguasai sebagian besar submateri dengan baik.'; }
+  else if(nilai >= 70){ predikat = 'Cukup'; ket = 'Menguasai submateri secara cukup, perlu penguatan.'; }
+  else { predikat = 'Perlu Bimbingan'; ket = 'Belum mencapai tujuan pembelajaran, disarankan mengulang materi.'; }
+
+  document.getElementById('predikatText').textContent = predikat;
+  document.getElementById('keteranganText').textContent = ket;
+
+  let reviewHtml = '';
+  userAnswers.forEach((ok, i) => {
+    reviewHtml += `<div class="review-row">
+      <span class="num">#${i+1}</span>
+      <span class="mark ${ok ? 'ok':'bad'}">${ok ? '✓ Benar' : '✕ Salah'}</span>
+      <span style="color:var(--ink-soft);font-size:13px;">${QUESTIONS[i].q.slice(0,46)}${QUESTIONS[i].q.length>46?'…':''}</span>
+    </div>`;
+  });
+  document.getElementById('reviewList').innerHTML = reviewHtml;
+}
+
+document.getElementById('restartBtn').addEventListener('click', () => {
+  current = 0; correctCount = 0; userAnswers.length = 0;
+  tallyCorrect.textContent = 0; tallyWrong.textContent = 0;
+  resultArea.classList.remove('show');
+  quizArea.style.display = 'block';
+  renderQuestion();
+});
+
+renderQuestion();
+</script>
+</body>
+</html>
